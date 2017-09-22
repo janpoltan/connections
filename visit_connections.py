@@ -123,6 +123,7 @@ def visit_profiles():
                 else:
                     visit_profile(contact_name, contact_link)
             except:
+                driver.close()
                 print "Unexpected error: ", sys.exc_info()[0]
             finally:
                 simulate_pause(start=5, end=15)
