@@ -125,7 +125,6 @@ def visit_profiles():
             except:
                 print "Unexpected error: ", sys.exc_info()[0]
             finally:
-                ctr = ctr + 1
                 simulate_pause(start=5, end=15)
 
 
