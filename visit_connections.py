@@ -21,6 +21,7 @@ contacts_found = {}
 exclude_contacts = []
 
 def load_contacts():
+    global contacts_found
     if os.path.exists(CONTACTS_FILE_PATH):
         contacts_found = pickle.load(open(CONTACTS_FILE_PATH, 'rb'))
 
@@ -28,6 +29,7 @@ def save_contacts():
     pickle.dump(contacts_found, open(CONTACTS_FILE_PATH, 'wb'))
 
 def do_visit(username, password, excluded):
+    global exclude_contacts
     """Visits the profile under People you may know"""
     if username is None or password is None:
         sys.exit('username and pasword is require')
@@ -114,19 +116,26 @@ def visit_profiles():
             contact_link = value.get('profile_link')
             try:
                 # TODO: Refactor this, proper way to exclude an item
+                excluded = False
                 if len(exclude_contacts) > 0:
                     for ex in exclude_contacts:
-                        if contact_name.lower().find(ex) > -1:
-                            print 'Skipping ', contact_name
+                        if contact_name.lower().find(ex) == -1:
+                            continue
                         else:
-                            visit_profile(contact_name, contact_link)
+                            excluded = True
+                            break
                 else:
+                    print 'Exclude list is empty'
+
+                if not excluded:
                     visit_profile(contact_name, contact_link)
+                else:
+                    print 'Skipping ', contact_name
             except:
                 driver.close()
                 print "Unexpected error: ", sys.exc_info()[0]
             finally:
-                simulate_pause(start=5, end=15)
+                simulate_pause(start=1, end=5)
 
 
 def visit_profile(contact_name, contact_link):
