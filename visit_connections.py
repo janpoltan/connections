@@ -39,6 +39,10 @@ def do_visit(username, password, excluded):
     load_contacts()
 
     do_login(username, password)
+
+    # This loads the profiles in the my connections
+    go_to_my_connections()
+    get_connections()
     
     go_to_mynetwork_page()
 
@@ -51,6 +55,7 @@ def do_visit(username, password, excluded):
 
     add_profile_to_visit(profile_list)
 
+    # This loads the profiles in the 'People you may know'
     while True:
         # Loads the other profile
         simulate_press_end()
@@ -102,11 +107,7 @@ def add_profile_to_visit(profile_list_elem):
         ember_id = profile_link_elem.get_attribute('id')
         profile_name = person_info.get_attribute('innerHTML').encode('utf-8').strip()
         profile_link = profile_link_elem.get_attribute('href').encode('utf-8').strip()
-        if contacts_found.has_key(ember_id) is False:
-            contacts_found[ember_id] = {
-                u'profile_name': profile_name,
-                u'profile_link': profile_link
-            }
+        add_to_contacts(ember_id, profile_name, profile_link)
 
 def visit_profiles():
     total_found = len(contacts_found)
@@ -117,7 +118,8 @@ def visit_profiles():
             try:
                 # TODO: Refactor this, proper way to exclude an item
                 excluded = False
-                if len(exclude_contacts) > 0:
+                total_exclude_contacts = len(exclude_contacts)
+                if total_exclude_contacts > 0:
                     for ex in exclude_contacts:
                         if contact_name.lower().find(ex) == -1:
                             continue
@@ -148,3 +150,34 @@ def visit_profile(contact_name, contact_link):
 def simulate_pause(start=5, end=8):
     """Simulates a pause"""
     time.sleep(randint(start, end))
+
+def go_to_my_connections():
+    WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, 'mynetwork-tab-icon'))
+    )
+    driver.get('https://www.linkedin.com/mynetwork/invite-connect/connections/')
+    simulate_pause(1,5)
+
+def get_connections():
+    try:
+        # TODO: Need to check on connections paging
+        connections = driver.find_elements_by_class_name('mn-person-card')        
+        for conn in connections:
+            anchor = conn.find_element_by_class_name('mn-person-info__picture')
+            ember_id = anchor.get_attribute('id')
+            profile_link = anchor.get_attribute('href')            
+            name = conn.find_element_by_class_name('mn-person-info__name')
+            profile_name = name.get_attribute('innerHTML').encode('utf-8').strip()
+            add_to_contacts(ember_id, profile_name, profile_link)
+    except:
+        print 'Error getting connections container class connection-card"'
+    
+    finally:
+        simulate_pause(1,5)
+
+def add_to_contacts(ember_id, profile_name, profile_link):
+    if contacts_found.has_key(ember_id) is False:
+        contacts_found[ember_id] = {
+            u'profile_name': profile_name,
+            u'profile_link': profile_link
+        }
