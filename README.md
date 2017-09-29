@@ -2,7 +2,7 @@
 
 ###Description
  
-Visits connections and people who may know in linked.
+Visits connections and people who may know in LinkedIn
 
 **Warning: Under development**
 
