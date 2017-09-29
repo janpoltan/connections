@@ -31,14 +31,14 @@ TODO
 ###Usage 
 ```python
 from visit_connections import do_visit
-profiles_viewed = do_visit('myusername@email.com','mypass')
+exclude_list = ['john', 'paul']
+profiles_viewed = do_visit('myusername@email.com','mypass', exclude_list)
 print profiles_viewed 
 
 Output:
 {
-	viewed_profiles: 100,
-	profiles_list: 245,
-	settings: {}
+	total_profiles_found: 245,
+	total_viewed_profiles: 100	
 } 
 ```
  
@@ -47,5 +47,5 @@ Output:
  * Randomized viewing of profiles
  * Add a log
  * Use PhatomJS
- * Refactor as proper python module
+ * Refactor as proper python module (class)
  

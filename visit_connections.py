@@ -19,6 +19,8 @@ CONTACTS_FILE_PATH = 'contacts.p'
 driver = webdriver.Firefox()
 contacts_found = {}
 exclude_contacts = []
+visited_contacts = []
+
 
 def load_contacts():
     global contacts_found
@@ -77,6 +79,11 @@ def do_visit(username, password, excluded):
 
     save_contacts()
     driver.close()
+
+    return {
+        'total_profiles_found': len(contacts_found), 
+        'total_visited_connections': len(visited_contacts)
+    }
 
 
 def do_login(username, password):
@@ -141,11 +148,17 @@ def visit_profiles():
 
 
 def visit_profile(contact_name, contact_link):
+    global visited_contacts
     print 'Visiting ', contact_name
-    driver.get(contact_link)
-    simulate_pause(start=1, end=4)
-    simulate_press_end()
-    simulate_pause(start=2, end=5)
+    try:
+        driver.get(contact_link)
+        visited_contacts.append(contact_name)
+    except:
+        print 'Error visiting profile named %s at %s', (contact_name, contact_link)
+    finally:
+        simulate_pause(start=1, end=4)
+        simulate_press_end()
+        simulate_pause(start=2, end=5)
 
 def simulate_pause(start=5, end=8):
     """Simulates a pause"""
